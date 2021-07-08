@@ -1,0 +1,9 @@
+# For more information, run:
+#   $ gcloud topic gcloudignore
+#
+.gcloudignore
+.git
+.gitignore
+#!include:.gitignore
+
+!dist
