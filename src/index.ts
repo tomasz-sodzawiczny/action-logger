@@ -1,12 +1,18 @@
-const dotenv = require("dotenv").config();
+import { config } from "dotenv";
+config();
 
-const express = require("express");
-const helmet = require("helmet");
-const { getActions } = require("./action");
+import express from "express";
+import helmet from "helmet";
+import { createAction, getActions } from "./action";
 
 export const app = express();
 app.use(helmet());
-app.get("/actions", async () => {
-  const dupka = await getActions();
-  console.log(dupka);
+
+app.get("/actions", async (req, res) => {
+  const actions = await getActions();
+  res.json({ actions });
+});
+app.post("/actions", async (req, res) => {
+  const action = await createAction({ kind: "test" });
+  res.json({ action });
 });
