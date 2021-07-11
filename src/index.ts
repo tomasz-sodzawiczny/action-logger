@@ -9,12 +9,18 @@ dotenv();
 export const app = express();
 app.use(helmet());
 app.use(morgan("default"));
+app.use(express.json());
 
 app.get("/actions", async (req, res) => {
   const actions = await getActions();
   res.json({ actions });
 });
 app.post("/actions", async (req, res) => {
-  const action = await createAction({ kind: "test" });
+  const { kind } = req.body;
+  if (!kind || typeof kind !== "string") {
+    res.sendStatus(400);
+    return;
+  }
+  const action = await createAction({ kind });
   res.json({ action });
 });
