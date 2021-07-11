@@ -1,10 +1,10 @@
-import { config } from "dotenv";
-config();
-
+import { config as dotenv } from "dotenv";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import { createAction, getActions } from "./action";
+
+dotenv();
 
 export const app = express();
 app.use(helmet());

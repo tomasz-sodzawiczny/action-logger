@@ -1,4 +1,4 @@
-import { client, sql } from "./db";
+import { query, sql } from "./db";
 
 interface Action {
   id: number;
@@ -7,13 +7,13 @@ interface Action {
 }
 
 export async function getActions() {
-  const response = await client.query<Action>(sql`select * from actions;`);
-  return response.rows;
+  const result = await query<Action>(sql`select * from actions;`);
+  return result.rows;
 }
 
 export async function createAction({ kind }: { kind: string }) {
-  const createResponse = await client.query<Action>(
+  const result = await query<Action>(
     sql`insert into actions ( kind ) values ( ${kind} ) returning *;`
   );
-  return createResponse.rows[0];
+  return result.rows[0];
 }
