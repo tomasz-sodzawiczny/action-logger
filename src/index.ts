@@ -3,10 +3,12 @@ config();
 
 import express from "express";
 import helmet from "helmet";
+import morgan from "morgan";
 import { createAction, getActions } from "./action";
 
 export const app = express();
 app.use(helmet());
+app.use(morgan("default"));
 
 app.get("/actions", async (req, res) => {
   const actions = await getActions();
