@@ -15,12 +15,17 @@ app.get("/actions", async (req, res) => {
   const actions = await getActions();
   res.json({ actions });
 });
-app.post("/actions", async (req, res) => {
+// FW: express cant handle promise rejection
+app.post("/actions", async (req, res, next) => {
   const { kind } = req.body;
   if (!kind || typeof kind !== "string") {
     res.sendStatus(400);
     return;
   }
-  const action = await createAction({ kind });
-  res.json({ action });
+  try {
+    const action = await createAction({ kind });
+    res.json({ action });
+  } catch (e) {
+    next(e);
+  }
 });
