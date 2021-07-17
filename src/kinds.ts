@@ -1,3 +1,4 @@
+import { NotFound } from "http-errors";
 import { query, sql } from "./db";
 
 // FW: when generating this, id should be id type
@@ -13,6 +14,9 @@ export async function getKinds() {
 
 export async function getKind(id: number) {
   const result = await query<Kind>(sql`select * from kinds where id = ${id};`);
+  if (result.rowCount < 1) {
+    throw new NotFound(`No kind with id ${id}`);
+  }
   return result.rows[0];
 }
 

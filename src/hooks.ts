@@ -1,6 +1,7 @@
 import { query, sql } from "./db";
 import crypto from "crypto";
 import { createAction } from "./action";
+import { InternalServerError, NotFound } from "http-errors";
 
 // FW: when generating this, id should be id type
 interface Hook {
@@ -25,21 +26,16 @@ export async function getHooks() {
 }
 
 export async function createHook({ kind_id }: { kind_id: number }) {
-  try {
-    const token = generateHookToken();
+  const token = generateHookToken();
 
-    // FW: insertOne()?
-    const result = await query<Hook>(
-      sql`insert into hooks ( kind_id, token ) values ( ${kind_id}, ${token} ) returning *;`
-    );
-    if (result.rowCount !== 1) {
-      throw new Error(`Insert failed`);
-    }
-    return result.rows[0];
-  } catch (e) {
-    // FW chaining errors
-    throw new Error(`Insert failed: ${e}`);
+  // FW: insertOne()?
+  const result = await query<Hook>(
+    sql`insert into hooks ( kind_id, token ) values ( ${kind_id}, ${token} ) returning *;`
+  );
+  if (result.rowCount !== 1) {
+    throw new InternalServerError(`Insert failed`);
   }
+  return result.rows[0];
 }
 
 export async function handleHook(token: string) {
@@ -47,7 +43,7 @@ export async function handleHook(token: string) {
     sql`select * from hooks where token = ${token}`
   );
   if (result.rowCount === 0) {
-    throw new Error("unkown");
+    throw new NotFound();
   }
   return createAction(result.rows[0].kind_id);
 }

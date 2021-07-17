@@ -1,3 +1,4 @@
+import { BadRequest, InternalServerError, isHttpError } from "http-errors";
 import { query, sql } from "./db";
 
 interface Action {
@@ -17,24 +18,19 @@ export async function createActionByName(kind: string) {
   );
   // FW: this should be included in some queryOne(), also it shuold check that !(count > 1)
   if (kindResult.rowCount === 0) {
-    throw new Error(`Unknown kind: ${kind}`);
+    throw new BadRequest(`Unknown kind: ${kind}`);
   }
 
   return createAction(kindResult.rows[0].id);
 }
 
 export async function createAction(kindId: number) {
-  try {
-    // FW: insertOne()?
-    const result = await query<Action>(
-      sql`insert into actions ( kind_id ) values ( ${kindId} ) returning *;`
-    );
-    if (result.rowCount !== 1) {
-      throw new Error(`Insert failed`);
-    }
-    return result.rows[0];
-  } catch (e) {
-    // FW chaining errors
-    throw new Error(`Insert failed: ${e}`);
+  // FW: insertOne()?
+  const result = await query<Action>(
+    sql`insert into actions ( kind_id ) values ( ${kindId} ) returning *;`
+  );
+  if (result.rowCount !== 1) {
+    throw new Error(`Insert failed`);
   }
+  return result.rows[0];
 }
