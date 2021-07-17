@@ -57,7 +57,6 @@ app.post("/hooks", async (req, res) => {
   res.json({ hook });
 });
 app.post("/h/:token", async (req, res) => {
-  console.log("hmm");
   const { token } = req.params;
   const hook = await handleHook(token);
   res.json({ hook });
