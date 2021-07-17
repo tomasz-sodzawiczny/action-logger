@@ -3,6 +3,8 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import { createActionByName, getActions } from "./action";
+import { createHook, getHooks, handleHook } from "./hooks";
+import { createKind, getKind, getKinds } from "./kinds";
 
 dotenv();
 
@@ -28,4 +30,35 @@ app.post("/actions", async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+});
+
+app.get("/kinds", async (req, res) => {
+  const kinds = await getKinds();
+  res.json({ kinds });
+});
+app.get("/kinds/:id", async (req, res) => {
+  // @ts-ignore TODO
+  const kind = await getKind(req.params.id);
+  res.json({ kind });
+});
+app.post("/kinds", async (req, res) => {
+  const { name } = req.body;
+  const kind = createKind({ name });
+  res.json({ kind });
+});
+
+app.get("/hooks", async (req, res) => {
+  const hooks = await getHooks();
+  res.json({ hooks });
+});
+app.post("/hooks", async (req, res) => {
+  const { kind_id } = req.body;
+  const hook = createHook({ kind_id });
+  res.json({ hook });
+});
+app.post("/h/:token", async (req, res) => {
+  console.log("hmm");
+  const { token } = req.params;
+  const hook = await handleHook(token);
+  res.json({ hook });
 });
