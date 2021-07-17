@@ -11,21 +11,25 @@ export async function getActions() {
   return result.rows;
 }
 
-export async function createAction({ kind }: { kind: string }) {
-  try {
-    const kindResult = await query<Action>(
-      sql`select id from kinds where name = ${kind};`
-    );
-    // FW: this should be included in some queryOne(), also it shuold check that !(count > 1)
-    if (kindResult.rowCount === 0) {
-      throw new Error(`Unknown kind: ${kind}`);
-    }
+export async function createActionByName(kind: string) {
+  const kindResult = await query<Action>(
+    sql`select id from kinds where name = ${kind};`
+  );
+  // FW: this should be included in some queryOne(), also it shuold check that !(count > 1)
+  if (kindResult.rowCount === 0) {
+    throw new Error(`Unknown kind: ${kind}`);
+  }
 
+  return createAction(kindResult.rows[0].id);
+}
+
+export async function createAction(kindId: number) {
+  try {
     // FW: insertOne()?
     const result = await query<Action>(
-      sql`insert into actions ( kind_id ) values ( ${kindResult.rows[0].id} ) returning *;`
+      sql`insert into actions ( kind_id ) values ( ${kindId} ) returning *;`
     );
-    if (kindResult.rowCount !== 1) {
+    if (result.rowCount !== 1) {
       throw new Error(`Insert failed`);
     }
     return result.rows[0];

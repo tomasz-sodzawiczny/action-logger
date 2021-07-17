@@ -2,7 +2,7 @@ import { config as dotenv } from "dotenv";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import { createAction, getActions } from "./action";
+import { createActionByName, getActions } from "./action";
 
 dotenv();
 
@@ -23,7 +23,7 @@ app.post("/actions", async (req, res, next) => {
     return;
   }
   try {
-    const action = await createAction({ kind });
+    const action = await createActionByName(kind);
     res.json({ action });
   } catch (e) {
     next(e);
