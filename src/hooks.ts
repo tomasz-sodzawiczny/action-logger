@@ -2,6 +2,7 @@ import { query, sql } from "./db";
 import crypto from "crypto";
 import { createAction } from "./action";
 import { InternalServerError, NotFound } from "http-errors";
+import Router from "@koa/router";
 
 // FW: when generating this, id should be id type
 interface Hook {
@@ -47,3 +48,22 @@ export async function handleHook(token: string) {
   }
   return createAction(result.rows[0].kind_id);
 }
+
+export const hooksRouter = new Router();
+
+hooksRouter.get("/hooks", async (ctx) => {
+  const hooks = await getHooks();
+  ctx.body = { hooks };
+});
+hooksRouter.post("/hooks", async (ctx) => {
+  const { kind_id } = ctx.body;
+  const hook = createHook({ kind_id });
+  ctx.body = { hook };
+});
+
+export const hooksTriggerRouter = new Router();
+hooksTriggerRouter.post("/:token", async (ctx) => {
+  const { token } = ctx.params;
+  const hook = await handleHook(token);
+  ctx.body = { hook };
+});

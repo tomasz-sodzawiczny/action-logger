@@ -1,1 +1,1 @@
-curl  http://localhost:8080/hooks 
+curl  http://localhost:8080/api/hooks 

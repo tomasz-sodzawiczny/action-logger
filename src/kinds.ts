@@ -1,3 +1,4 @@
+import Router from "@koa/router";
 import { NotFound } from "http-errors";
 import { query, sql } from "./db";
 
@@ -26,3 +27,20 @@ export async function createKind({ name }: { name: string }) {
   );
   return result.rows[0];
 }
+
+export const kindsRouter = new Router();
+
+kindsRouter.get("/kinds", async (ctx) => {
+  const kinds = await getKinds();
+  ctx.body = { kinds };
+});
+kindsRouter.get("/kinds/:id", async (ctx) => {
+  // @ts-ignore TODO
+  const kind = await getKind(ctx.params.id);
+  ctx.body = { kind };
+});
+kindsRouter.post("/kinds", async (ctx) => {
+  const { name } = ctx.body;
+  const kind = createKind({ name });
+  ctx.body = { kind };
+});

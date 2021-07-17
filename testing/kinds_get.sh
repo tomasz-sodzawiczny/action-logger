@@ -1,1 +1,1 @@
-curl  http://localhost:8080/kinds
+curl  http://localhost:8080/api/kinds

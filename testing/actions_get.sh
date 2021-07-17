@@ -1,1 +1,1 @@
-curl  http://localhost:8080/actions 
+curl  http://localhost:8080/api/actions 

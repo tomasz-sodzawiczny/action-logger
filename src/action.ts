@@ -1,3 +1,4 @@
+import Router from "@koa/router";
 import { BadRequest, InternalServerError, isHttpError } from "http-errors";
 import { query, sql } from "./db";
 
@@ -34,3 +35,19 @@ export async function createAction(kindId: number) {
   }
   return result.rows[0];
 }
+
+export const actionsRouter = new Router();
+
+actionsRouter.get("/actions", async (ctx) => {
+  const actions = await getActions();
+  ctx.body = { actions };
+});
+actionsRouter.post("/actions", async (ctx) => {
+  const { kind } = ctx.body;
+  if (!kind || typeof kind !== "string") {
+    ctx.status = 400;
+    return;
+  }
+  const action = await createActionByName(kind);
+  ctx.body = { action };
+});
