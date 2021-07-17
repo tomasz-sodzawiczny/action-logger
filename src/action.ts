@@ -2,7 +2,7 @@ import { query, sql } from "./db";
 
 interface Action {
   id: number;
-  kind: string;
+  kind_id: number;
   createAt: string;
 }
 
