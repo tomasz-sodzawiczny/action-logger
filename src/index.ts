@@ -12,6 +12,7 @@ import {
   hooksTriggerRouter,
 } from "./hooks";
 import { createKind, getKind, getKinds, kindsRouter } from "./kinds";
+import { Unauthorized } from "http-errors";
 
 dotenv();
 
@@ -19,10 +20,18 @@ const app = new Koa();
 const router = new Router();
 
 const apiRouters = [kindsRouter, actionsRouter, hooksRouter];
+router.use("/api", (ctx, next) => {
+  const header = ctx.header["authorization"];
+  if (header !== `Bearer ${process.env.AUTH_TOKEN}`) {
+    throw new Unauthorized();
+  }
+  return next();
+});
 apiRouters.forEach((r) => {
   router.use("/api", r.routes());
   router.use("/api", r.allowedMethods());
 });
+
 router.use(
   "/h",
   hooksTriggerRouter.routes(),
