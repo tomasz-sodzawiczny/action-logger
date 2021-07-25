@@ -8,8 +8,22 @@ interface Action {
   createAt: string;
 }
 
-export async function getActions() {
-  const result = await query<Action>(sql`select * from actions;`);
+interface GetActionsOptions {
+  kindId?: string;
+  sort?: string;
+}
+export async function getActions({ kindId, sort }: GetActionsOptions = {}) {
+  const q = sql`SELECT * FROM actions`;
+  if (kindId) {
+    q.append(sql` WHERE kind_id = ${kindId}`);
+  }
+  if (sort === "new") {
+    q.append(sql` ORDER BY created_at DESC`);
+  } else {
+    q.append(sql` ORDER BY created_at ASC`);
+  }
+
+  const result = await query<Action>(q);
   return result.rows;
 }
 
@@ -39,7 +53,10 @@ export async function createAction(kindId: number) {
 export const actionsRouter = new Router();
 
 actionsRouter.get("/actions", async (ctx) => {
-  const actions = await getActions();
+  const kindId = ctx.query["kind_id"];
+  const sort = ctx.query["sort"] || "oldest";
+  if (Array.isArray(kindId) || Array.isArray(sort)) throw new BadRequest();
+  const actions = await getActions({ kindId, sort });
   ctx.body = { actions };
 });
 actionsRouter.post("/actions", async (ctx) => {
