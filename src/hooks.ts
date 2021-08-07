@@ -1,7 +1,7 @@
 import { query, sql } from "./db";
 import crypto from "crypto";
 import { createAction } from "./action";
-import { InternalServerError, NotFound } from "http-errors";
+import { BadRequest, InternalServerError, NotFound } from "http-errors";
 import Router from "@koa/router";
 
 // FW: when generating this, id should be id type
@@ -21,8 +21,13 @@ function generateHookToken() {
     .replace(/\+/g, "-");
 }
 
-export async function getHooks() {
-  const result = await query<Hook>(sql`select * from hooks;`);
+export async function getHooks(kindId?: string) {
+  const q = sql`SELECT * FROM hooks`;
+  if (kindId) {
+    q.append(sql` WHERE kind_id = ${kindId}`);
+  }
+
+  const result = await query<Hook>(q);
   return result.rows;
 }
 
@@ -52,7 +57,10 @@ export async function handleHook(token: string) {
 export const hooksRouter = new Router();
 
 hooksRouter.get("/hooks", async (ctx) => {
-  const hooks = await getHooks();
+  const kindId = ctx.query["kind_id"];
+  if (Array.isArray(kindId)) throw new BadRequest();
+
+  const hooks = await getHooks(kindId);
   ctx.body = { hooks };
 });
 hooksRouter.post("/hooks", async (ctx) => {
