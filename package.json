@@ -1,13 +1,12 @@
 {
   "name": "action-logger",
   "version": "1.0.0",
-  "main": "dist/index.js",
   "repository": "git@github.com:tomasz-sodzawiczny/action-logger.git",
   "author": "Tomasz Sodzawiczny <tsodzawiczny@gmail.com>",
   "license": "UNLICENSED",
   "scripts": {
     "build": "tsc",
-    "start": "functions-framework --target handler",
+    "start": "functions-framework --source dist/index.js --target handler",
     "deploy": "gcloud --project action-logger-319221 functions deploy action-logger --region europe-west1 --runtime nodejs14 --trigger-http --entry-point handler"
   },
   "devDependencies": {

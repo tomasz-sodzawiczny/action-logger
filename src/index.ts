@@ -19,7 +19,9 @@ dotenv();
 const app = new Koa();
 const router = new Router();
 
+// List of all api routers. 
 const apiRouters = [kindsRouter, actionsRouter, hooksRouter];
+
 router.use("/api", (ctx, next) => {
   const header = ctx.header["authorization"];
   if (header !== `Bearer ${process.env.AUTH_TOKEN}`) {
